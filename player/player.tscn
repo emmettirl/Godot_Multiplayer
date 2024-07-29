@@ -1,4 +1,4 @@
-[gd_scene load_steps=72 format=3 uid="uid://d0ycqher2irbl"]
+[gd_scene load_steps=74 format=3 uid="uid://d0ycqher2irbl"]
 
 [ext_resource type="Texture2D" uid="uid://cln1ubxiy43oh" path="res://art/characters/elf/double_jump_start/0_Dark_Elves_Double Jump_000.png" id="1_eu1x0"]
 [ext_resource type="Script" path="res://player/player.gd" id="1_s6fvu"]
@@ -68,6 +68,7 @@
 [ext_resource type="Texture2D" uid="uid://bbthkjqiq33il" path="res://art/characters/elf/walk/0_Dark_Elves_Walking_021.png" id="64_k845p"]
 [ext_resource type="Texture2D" uid="uid://b771rxse6n114" path="res://art/characters/elf/walk/0_Dark_Elves_Walking_022.png" id="65_jmt5r"]
 [ext_resource type="Texture2D" uid="uid://c2r31n6lj0pks" path="res://art/characters/elf/walk/0_Dark_Elves_Walking_023.png" id="66_db2fi"]
+[ext_resource type="PackedScene" uid="uid://dtnsgbxp8h7fy" path="res://player/player_finder.tscn" id="69_nf5xc"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4lind"]
 size = Vector2(40, 56)
@@ -303,18 +304,23 @@ animations = [{
 "speed": 24.0
 }]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_vf8gb"]
+size = Vector2(200, 500)
+
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_qs3mx"]
-properties/0/path = NodePath(".:position")
+properties/0/path = NodePath("AnimatedSprite2D:animation")
 properties/0/spawn = true
 properties/0/replication_mode = 1
-properties/1/path = NodePath("AnimatedSprite2D:animation")
+properties/1/path = NodePath("AnimatedSprite2D:scale")
 properties/1/spawn = true
 properties/1/replication_mode = 1
-properties/2/path = NodePath("AnimatedSprite2D:scale")
+properties/2/path = NodePath(".:target_position")
 properties/2/spawn = true
 properties/2/replication_mode = 1
 
 [node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("player_sprite")]
+collision_layer = 2
+collision_mask = 3
 script = ExtResource("1_s6fvu")
 player_sprite = NodePath("AnimatedSprite2D")
 player_camera = ExtResource("2_ovmdd")
@@ -330,7 +336,25 @@ sprite_frames = SubResource("SpriteFrames_k3s6g")
 animation = &"double_jump_start"
 autoplay = "idle"
 
+[node name="InteractionHandler" type="Area2D" parent="AnimatedSprite2D"]
+collision_layer = 0
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AnimatedSprite2D/InteractionHandler"]
+position = Vector2(250, 45)
+shape = SubResource("RectangleShape2D_vf8gb")
+
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_qs3mx")
 
+[node name="PlayerFinder" parent="." instance=ExtResource("69_nf5xc")]
+visible = false
+position = Vector2(0, -27)
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+
 [connection signal="animation_finished" from="AnimatedSprite2D" to="." method="_on_animated_sprite_2d_animation_finished"]
+[connection signal="area_entered" from="AnimatedSprite2D/InteractionHandler" to="." method="_on_interaction_handler_area_entered"]
+[connection signal="area_exited" from="AnimatedSprite2D/InteractionHandler" to="." method="_on_interaction_handler_area_exited"]
+[connection signal="screen_entered" from="VisibleOnScreenNotifier2D" to="." method="_on_visible_on_screen_notifier_2d_screen_entered"]
+[connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="_on_visible_on_screen_notifier_2d_screen_exited"]

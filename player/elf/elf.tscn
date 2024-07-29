@@ -1,0 +1,12 @@
+[gd_scene load_steps=3 format=3 uid="uid://bl15sqied3xih"]
+
+[ext_resource type="PackedScene" uid="uid://d0ycqher2irbl" path="res://player/player.tscn" id="1_sshy1"]
+[ext_resource type="SpriteFrames" uid="uid://m40y6257uddo" path="res://player/elf/elf.tres" id="2_c8umj"]
+
+[node name="Elf" instance=ExtResource("1_sshy1")]
+movement_speed = 350
+jump_strength = 500
+
+[node name="AnimatedSprite2D" parent="." index="1"]
+sprite_frames = ExtResource("2_c8umj")
+animation = &"idle"

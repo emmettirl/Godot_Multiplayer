@@ -37,8 +37,11 @@ func _on_start_button_pressed() -> void:
 func change_level(scene):
 	for c in level_container.get_children():
 		level_container.remove_child(c)
+		c.level_complete.disconnect(_on_level_complete)
 		c.queue_free()
-	level_container.add_child(scene.instantiate())
+	var new_level = scene.instantiate()
+	level_container.add_child(new_level)
+	new_level.level_complete.connect(_on_level_complete)
 
 func _on_connection_failed():
 	status_label.text = "Failed to Connect"
@@ -51,3 +54,7 @@ func _on_connected_to_server():
 func hide_menu():
 	ui.hide()
 	
+
+func _on_level_complete():
+	print("_on_level_complete")
+	call_deferred("change_level", level_scene)
